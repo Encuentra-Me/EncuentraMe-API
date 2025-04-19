@@ -11,4 +11,5 @@ import com.research_and_mobile_solutions.encuentra_me.model.User;
 public interface IUserRepository extends JpaRepository<User, Long>{
 
     Optional<User> findByEmail(String email);
+    boolean existsByEmail(String email);
 }
