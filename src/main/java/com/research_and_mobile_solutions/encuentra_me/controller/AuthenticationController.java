@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.research_and_mobile_solutions.encuentra_me.dto.AuthenticationRequest;
@@ -49,5 +50,16 @@ public class AuthenticationController {
     ) {
         boolean isAvailable = service.isEmailAvailable(email);  
         return ResponseEntity.ok(isAvailable);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            service.logout(token);
+        }
+        return ResponseEntity.ok().build();
     }
 } 

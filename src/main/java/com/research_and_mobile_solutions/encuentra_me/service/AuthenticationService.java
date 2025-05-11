@@ -75,4 +75,13 @@ public class AuthenticationService {
     public boolean isEmailAvailable(String email) {
         return !userRepository.existsByEmail(email);
     }
+
+    public void logout(String token) {
+        // In a real implementation, you might want to:
+        // 1. Add the token to a blacklist
+        // 2. Clear any server-side sessions
+        // 3. Invalidate refresh tokens
+        // For now, we'll just return a success response
+        // The client should remove the token from storage
+    }
 } 

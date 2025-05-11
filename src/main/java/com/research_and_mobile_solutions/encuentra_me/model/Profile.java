@@ -47,6 +47,7 @@ public class Profile extends AuditModel{
     @Column(nullable = false)
     private String documentType;
 
+    @Pattern(regexp = "^[0-9]{8}$")
     @Column(nullable = false)
     private String documentNumber;
 
