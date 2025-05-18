@@ -29,11 +29,15 @@ public class AuthenticationController {
             @RequestBody RegisterRequest request
     ) {
         System.out.println(request.getFirstName());
-        System.out.println(request.getLastName());
-        System.out.println(request.getPhone());
-        System.out.println(request.getBirthDate());
-        System.out.println(request.getDocumentNumber());
+        System.out.println(request.getPaternalLastName());
+        System.out.println(request.getMaternalLastName());
         System.out.println(request.getDocumentType());
+        System.out.println(request.getDocumentNumber());
+        System.out.println(request.getBirthDate());
+        System.out.println(request.getCountryCode());
+        System.out.println(request.getPhone());
+        System.out.println(request.getUbigeo());
+        System.out.println(request.getRoleId());
         return ResponseEntity.ok(service.register(request));
     }
 

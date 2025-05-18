@@ -34,15 +34,10 @@ public class Profile extends AuditModel{
     private String firstName;
 
     @Column(nullable = false)
-    private String lastName;
+    private String paternalLastName;
 
-    @Pattern(regexp = "^[0-9]{9}$")
     @Column(nullable = false)
-    private String phone;
-
-    @Pattern(regexp = "^\\d{2}/\\d{2}/\\d{4}$")
-    @Column(nullable = false)
-    private String birthDate;
+    private String maternalLastName;
 
     @Column(nullable = false)
     private String documentType;
@@ -50,6 +45,22 @@ public class Profile extends AuditModel{
     @Pattern(regexp = "^[0-9]{8}$")
     @Column(nullable = false)
     private String documentNumber;
+
+    @Pattern(regexp = "^\\d{2}/\\d{2}/\\d{4}$")
+    @Column(nullable = false)
+    private String birthDate;
+    
+    @Column(nullable = false)
+    private String countryCode;
+
+    @Pattern(regexp = "^[0-9]{9}$")
+    @Column(nullable = false)
+    private String phone;
+
+    @Pattern(regexp = "^[0-9]{6}$")
+    @Column(nullable = false)
+    private String ubigeo;
+
 
     @OneToOne
     @JoinColumn(name="user_id")

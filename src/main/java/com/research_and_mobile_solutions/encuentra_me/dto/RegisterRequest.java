@@ -18,7 +18,7 @@ public class RegisterRequest {
     @NotBlank
     private String email;
 
-    @Size(min = 6)
+    @Size(min = 6, message = "[Contraseña] Debe tener mínimo 6 caracteres")
     @NotBlank
     private String password;
 
@@ -26,17 +26,29 @@ public class RegisterRequest {
     private String firstName;
 
     @NotBlank
-    private String lastName;
+    private String paternalLastName;
 
-    @Pattern(regexp = "^[0-9]{9}$", message = "Phone number must be 9 digits")
-    private String phone;
-
-    @Pattern(regexp = "^\\d{2}/\\d{2}/\\d{4}$", message = "Birth date must be in format DD/MM/YYYY")
-    private String birthDate;
+    @NotBlank
+    private String maternalLastName;
 
     @NotBlank
     private String documentType;
 
     @NotBlank
     private String documentNumber;
+
+    @Pattern(regexp = "^\\d{2}/\\d{2}/\\d{4}$", message = "[Fecha de nacimiento] El formato debe ser DD/MM/YYYY")
+    private String birthDate;
+
+    @NotBlank
+    private String countryCode;
+
+    @Pattern(regexp = "^[0-9]{9}$", message = "[Celular] Debe tener 9 digitos")
+    private String phone;
+
+    @Pattern(regexp = "^[0-9]{6}$", message = "[Ubigeo] Debe tener 6 digitos")
+    private String ubigeo;
+
+    @NotBlank(message = "[Rol] El rol es requerido")
+    private Long roleId;
 } 
