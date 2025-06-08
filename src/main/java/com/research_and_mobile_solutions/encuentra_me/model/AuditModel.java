@@ -34,4 +34,8 @@ public abstract class AuditModel implements Serializable{
     @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
     private Date updatedAt;
+
+    // ✅ Constructor vacío requerido por JPA para subclases
+    public AuditModel() {
+    }
 }
