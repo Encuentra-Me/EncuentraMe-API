@@ -1,26 +1,22 @@
-package com.research_and_mobile_solutions.encuentra_me.resource;
+package com.research_and_mobile_solutions.encuentra_me.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
-public class ReportResource {
-
-    private Long id;
+public class ReportRequest {
 
     private String name;
     private String lastName;
-    private String status;
+    //private String status;
     private Integer age;
     private String bornCountry;
     private String lastSeen;
     private String placeLastSeen;
-
     private String alertNoteUrl;
 
+    // URLs de imágenes
     private String image1Url;
     private String image2Url;
     private String image3Url;
@@ -28,6 +24,7 @@ public class ReportResource {
     private String image5Url;
     private String image6Url;
 
+    // Datos físicos
     private String tez;
     private String sangre;
     private String contextura;
@@ -37,5 +34,6 @@ public class ReportResource {
     private String ojos;
     private String nariz;
 
-    private Double reconocimiento;
+    // Reconocimiento AI
+    //private Double reconocimiento;
 }
