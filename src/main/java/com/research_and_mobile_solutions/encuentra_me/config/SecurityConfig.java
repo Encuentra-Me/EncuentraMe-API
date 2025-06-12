@@ -35,6 +35,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/api/auth/**",
+                    "/api/roles/**",
                     "/api/v1/reports/**",
                     "/api/v1/rekognition/**"   ,           // ← API pública temporalmente
                     "/swagger-ui/**",
