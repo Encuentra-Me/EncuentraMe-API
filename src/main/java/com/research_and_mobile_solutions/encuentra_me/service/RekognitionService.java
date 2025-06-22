@@ -24,11 +24,15 @@ public class RekognitionService {
 
     private final RekognitionClient rekognitionClient;
 
-    public RekognitionService() {
+    /*public RekognitionService() {
         this.rekognitionClient = RekognitionClient.builder()
                 .region(Region.US_EAST_1) // Cambia si usas otra región
                 .credentialsProvider(ProfileCredentialsProvider.create())
                 .build();
+    }*/
+
+    public RekognitionService(RekognitionClient rekognitionClient) {
+        this.rekognitionClient = rekognitionClient;
     }
 
     public void createCollection(String collectionId) {
@@ -181,4 +185,47 @@ public class RekognitionService {
         throw new RuntimeException("Error general al indexar desde URL", e);
     }
 }
+
+    public int deleteFacesByExternalId(String collectionId, String externalId) {
+    try {
+        // Obtener todas las caras de la colección
+        ListFacesRequest listRequest = ListFacesRequest.builder()
+                .collectionId(collectionId)
+                .maxResults(1000)
+                .build();
+
+        ListFacesResponse listResponse = rekognitionClient.listFaces(listRequest);
+
+        // Filtrar las caras con el externalId proporcionado
+        List<String> faceIdsToDelete = listResponse.faces().stream()
+                .filter(face -> externalId.equals(face.externalImageId()))
+                .map(Face::faceId)
+                .collect(Collectors.toList());
+
+        if (faceIdsToDelete.isEmpty()) {
+            throw new RuntimeException("No se encontraron rostros con externalId: " + externalId);
+        }
+
+        // Eliminar las caras encontradas
+        DeleteFacesRequest deleteRequest = DeleteFacesRequest.builder()
+                .collectionId(collectionId)
+                .faceIds(faceIdsToDelete)
+                .build();
+
+        //rekognitionClient.deleteFaces(deleteRequest);
+        //System.out.println("Rostros eliminados con externalId: " + externalId);
+
+        DeleteFacesResponse deleteResponse = rekognitionClient.deleteFaces(deleteRequest);
+        int deletedCount = deleteResponse.deletedFaces().size();
+
+        System.out.println("Rostros eliminados: " + deletedCount + " para externalId: " + externalId);
+        return deletedCount;
+
+        } catch (RekognitionException e) {
+            System.err.println("Error de Rekognition al eliminar rostros: " + e.awsErrorDetails().errorMessage());
+            throw new RuntimeException("Error al eliminar rostros con externalId: " + externalId, e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error general al eliminar rostros con externalId", e);
+        }
+    }
 }

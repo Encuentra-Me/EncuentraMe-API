@@ -57,7 +57,7 @@ public class ReportController {
     @PutMapping("/{id}/reconocimiento")
     public ResponseEntity<ReportResource> updateReconocimiento(
             @PathVariable Long id,
-            @RequestBody Double reconocimiento) {
+            @RequestParam Double reconocimiento) {
         
         ReportResource updated = reportService.updateReconocimiento(id, reconocimiento);
         return ResponseEntity.ok(updated);
@@ -77,4 +77,17 @@ public class ReportController {
     public Report createAndIndexReport(@RequestBody ReportIndexRequest request) {
         return reportService.createAndIndexReport(request);
     }
+
+    @PutMapping("/{id}/reset")
+    public ResponseEntity<ReportResource> resetReport(@PathVariable Long id) {
+        return ResponseEntity.ok(reportService.resetReport(id));
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<List<ReportResource>> getReportsByStatus(
+            @RequestParam String status) {
+        List<ReportResource> results = reportService.getReportsByStatus(status);
+        return ResponseEntity.ok(results);
+    }
+
 }

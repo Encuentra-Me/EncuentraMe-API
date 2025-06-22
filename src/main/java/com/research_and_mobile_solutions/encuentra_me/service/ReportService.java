@@ -136,7 +136,6 @@ public class ReportService {
                 .toList();
     }
 
-
     public Report createAndIndexReport(ReportIndexRequest request) {
         // Crear y guardar Report en DB
         Report report = new Report();
@@ -168,5 +167,23 @@ public class ReportService {
         }
 
         return savedReport;
+    }
+
+    public ReportResource resetReport(Long id) {
+        Report report = reportRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Report not found with id: " + id));
+
+        report.setStatus("Desaparecido");
+        report.setReconocimiento(0.0);
+
+        Report updated = reportRepository.save(report);
+        return convertToResource(updated);
+    }
+
+    public List<ReportResource> getReportsByStatus(String status) {
+        List<Report> reports = reportRepository.findByStatus(status);
+        return reports.stream()
+                .map(this::convertToResource)
+                .toList();
     }
 }

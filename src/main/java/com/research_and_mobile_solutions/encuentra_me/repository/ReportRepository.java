@@ -10,6 +10,5 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     Optional<Report> findByAlertNoteUrl(String alertNoteUrl);
     List<Report> findByAgeLessThan(int age);
     List<Report> findByAgeGreaterThanEqual(int age);
-    //Optional<Report> findByExternalImageId(String externalImageId);
-    
+    List<Report> findByStatus(String status);  
 }

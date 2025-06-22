@@ -3,7 +3,6 @@ package com.research_and_mobile_solutions.encuentra_me.controller;
 import com.research_and_mobile_solutions.encuentra_me.dto.SimilarityResponse;
 import com.research_and_mobile_solutions.encuentra_me.service.RekognitionService;
 import lombok.RequiredArgsConstructor;
-//import software.amazon.awssdk.services.rekognition.model.DeleteCollectionRequest;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -54,5 +53,16 @@ public class RekognitionController {
     public ResponseEntity<String> deleteCollection(@PathVariable String collectionId) {
         rekognitionService.deleteCollection(collectionId);
         return ResponseEntity.ok("Colección eliminada: " + collectionId);
+    }
+
+    @DeleteMapping("/faces/by-external-id")
+    public ResponseEntity<String> deleteFacesByExternalId(
+            @RequestParam String collectionId,
+            @RequestParam String externalId) {
+        //rekognitionService.deleteFacesByExternalId(collectionId, externalId);
+        //return ResponseEntity.ok("Rostros eliminados correctamente para externalId: " + externalId);
+
+        int deletedCount = rekognitionService.deleteFacesByExternalId(collectionId, externalId);
+        return ResponseEntity.ok("Se eliminaron " + deletedCount + " rostro(s) para el reporte ID: " + externalId);
     }
 }
