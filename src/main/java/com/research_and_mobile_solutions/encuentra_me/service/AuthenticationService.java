@@ -33,6 +33,7 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .refreshToken(refreshToken)
+                .userId(user.getId())
                 .build();
     }
 
@@ -53,6 +54,7 @@ public class AuthenticationService {
             return AuthenticationResponse.builder()
                     .token(jwtToken)
                     .refreshToken(refreshToken)
+                    .userId(user.getId())
                     .build();
         } catch (org.springframework.security.core.AuthenticationException e) {
             throw e; // Let Spring Security handle the authentication exception

@@ -37,7 +37,7 @@ public class RekognitionService {
                 .build();
 
         CreateCollectionResponse response = rekognitionClient.createCollection(request);
-        System.out.println("Colección creada: " + response.collectionArn());
+        //System.out.println("Colección creada: " + response.collectionArn());
     }
 
     public void indexFace(String collectionId, MultipartFile image, String externalId) {

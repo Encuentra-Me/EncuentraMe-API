@@ -32,4 +32,8 @@ public class ProfileService {
         return profileRepository.save(profile);
     }
 
+    public Profile getProfileById(Long id) {
+        return profileRepository.findById(id).orElse(null);
+    }
+
 }
