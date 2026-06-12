@@ -3,14 +3,14 @@ package com.research_and_mobile_solutions.encuentra_me.service;
 import com.research_and_mobile_solutions.encuentra_me.model.Report;
 import com.research_and_mobile_solutions.encuentra_me.repository.ReportRepository;
 import com.research_and_mobile_solutions.encuentra_me.resource.ReportResource;
-import com.research_and_mobile_solutions.encuentra_me.dto.ReportIndexRequest;
+import jakarta.transaction.Transactional;
 import com.research_and_mobile_solutions.encuentra_me.dto.ReportRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import java.net.URI;
 import java.net.URL;
 
 @Service
@@ -136,37 +136,44 @@ public class ReportService {
                 .toList();
     }
 
+    private boolean isImageUrlValid(String imageUrl){
+        return (imageUrl != null && !imageUrl.isEmpty());
+    }
 
-    public Report createAndIndexReport(ReportIndexRequest request) {
-        // Crear y guardar Report en DB
+    @Transactional
+    public ReportResource createAndIndexReport(ReportRequest request, String collectionId) {
+        
         Report report = new Report();
-        report.setName(request.getName());
-        report.setLastName(request.getLastName());
-        report.setAge(request.getAge());
-        report.setBornCountry(request.getBornCountry());
-        report.setLastSeen(request.getLastSeen());
-        report.setPlaceLastSeen(request.getPlaceLastSeen());
-        report.setTez(request.getTez());
-        report.setSangre(request.getSangre());
-        report.setContextura(request.getContextura());
-        report.setEstatura(request.getEstatura());
-        report.setCabello(request.getCabello());
-        report.setBoca(request.getBoca());
-        report.setOjos(request.getOjos());
-        report.setNariz(request.getNariz());
-        report.setAlertNoteUrl(request.getAlertNoteUrl());
-        report.setImage1Url(request.getImage1Url());
+        mapDtoToEntity(request, report);
 
         Report savedReport = reportRepository.save(report);
+        String externalId = String.valueOf(savedReport.getId());
+
+        List<String> imageUrls = new ArrayList<>();
+        if(isImageUrlValid(request.getImage1Url())) imageUrls.add(request.getImage1Url());
+        if(isImageUrlValid(request.getImage2Url())) imageUrls.add(request.getImage2Url());
+        if(isImageUrlValid(request.getImage3Url())) imageUrls.add(request.getImage3Url());
+        if(isImageUrlValid(request.getImage4Url())) imageUrls.add(request.getImage4Url());
+        if(isImageUrlValid(request.getImage5Url())) imageUrls.add(request.getImage5Url());
+        if(isImageUrlValid(request.getImage6Url())) imageUrls.add(request.getImage6Url());
 
         // Indexar en AWS Rekognition usando image1Url y el ID como externalId
         try {
-            URL imageUrl = new URL(request.getImage1Url());
-            rekognitionService.indexFaceFromUrl(request.getCollectionId(), imageUrl, String.valueOf(savedReport.getId()));
+            for(String urlString: imageUrls){
+                URL imageUrl = URI.create(urlString).toURL();
+                rekognitionService.indexFaceFromUrl(
+                    collectionId, 
+                    imageUrl, 
+                    externalId
+                );
+
+            }
         } catch (Exception e) {
-            throw new RuntimeException("Error al indexar la imagen en Rekognition", e);
+            //throw new RuntimeException("Falló la indexación en AWS Rekognition El reporte no fue creado."+e.getMessage(), e);
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
-        return savedReport;
+        return convertToResource(savedReport);
     }
 }
