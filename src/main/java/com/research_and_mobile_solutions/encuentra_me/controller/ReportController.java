@@ -1,16 +1,11 @@
 package com.research_and_mobile_solutions.encuentra_me.controller;
 
 import java.util.List;
-
-import com.research_and_mobile_solutions.encuentra_me.dto.ReportIndexRequest;
 import com.research_and_mobile_solutions.encuentra_me.dto.ReportRequest;
-import com.research_and_mobile_solutions.encuentra_me.model.Report;
 import com.research_and_mobile_solutions.encuentra_me.service.ReportService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-
 import com.research_and_mobile_solutions.encuentra_me.resource.ReportResource;
 
 @RestController
@@ -25,6 +20,14 @@ public class ReportController {
         return reportService.getAllReports();
     }
 
+    @PostMapping
+    public ReportResource createAndIndexReport(
+        @RequestBody ReportRequest request, 
+        @RequestParam String collectionId) {
+
+        return reportService.createAndIndexReport(request, collectionId);
+    }
+
     // GET report by ID
     @GetMapping("/{id}")
     public ResponseEntity<ReportResource> getReportById(@PathVariable Long id) {
@@ -33,11 +36,11 @@ public class ReportController {
     }
 
     // POST new report
-    @PostMapping
+    /*@PostMapping
     public ResponseEntity<ReportResource> createReport(@RequestBody ReportRequest reportRequest) {
         ReportResource createdReport = reportService.createReport(reportRequest);
         return ResponseEntity.ok(createdReport);
-    }   
+    }*/   
 
     // PUT update report
     @PutMapping("/{id}")
@@ -73,8 +76,4 @@ public class ReportController {
         return reportService.getMayores();
     }
 
-    @PostMapping("/index")
-    public Report createAndIndexReport(@RequestBody ReportIndexRequest request) {
-        return reportService.createAndIndexReport(request);
-    }
 }
