@@ -1,9 +1,13 @@
 package com.research_and_mobile_solutions.encuentra_me.service;
 
 import com.research_and_mobile_solutions.encuentra_me.dto.SimilarityResponse;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.rekognition.RekognitionClient;
@@ -24,10 +28,17 @@ public class RekognitionService {
 
     private final RekognitionClient rekognitionClient;
 
-    public RekognitionService() {
+    public RekognitionService(
+        @Value("${aws.accessKey}") String accessKey,
+        @Value("${aws.secretKey}") String secretKey,
+        @Value("${aws.region}") String region
+    ) {
+
+        AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
+        
         this.rekognitionClient = RekognitionClient.builder()
-                .region(Region.US_EAST_1) // Cambia si usas otra región
-                .credentialsProvider(ProfileCredentialsProvider.create())
+                .region(Region.of(region)) // Cambia si usas otra región
+                .credentialsProvider(StaticCredentialsProvider.create(credentials))//ProfileCredentialsProvider.create())
                 .build();
     }
 
@@ -37,7 +48,6 @@ public class RekognitionService {
                 .build();
 
         CreateCollectionResponse response = rekognitionClient.createCollection(request);
-        //System.out.println("Colección creada: " + response.collectionArn());
     }
 
     public void indexFace(String collectionId, MultipartFile image, String externalId) {
@@ -146,39 +156,40 @@ public class RekognitionService {
     }
 
     public void indexFaceFromUrl(String collectionId, URL imageUrl, String externalId) {
-    try (InputStream inputStream = imageUrl.openStream()) {
-        byte[] imageBytesArray = inputStream.readAllBytes();
-        ByteBuffer imageBytes = ByteBuffer.wrap(imageBytesArray);
 
-        Image awsImage = Image.builder()
-                .bytes(SdkBytes.fromByteBuffer(imageBytes))
-                .build();
+        try (InputStream inputStream = imageUrl.openStream()) {
+            byte[] imageBytesArray = inputStream.readAllBytes();
+            ByteBuffer imageBytes = ByteBuffer.wrap(imageBytesArray);
 
-        // Validación previa con detectFaces()
-        DetectFacesRequest detectRequest = DetectFacesRequest.builder()
-                .image(awsImage)
-                .attributes(Attribute.DEFAULT)
-                .build();
+            Image awsImage = Image.builder()
+                    .bytes(SdkBytes.fromByteBuffer(imageBytes))
+                    .build();
 
-        DetectFacesResponse detectResponse = rekognitionClient.detectFaces(detectRequest);
-        if (detectResponse.faceDetails().isEmpty()) {
-            throw new RuntimeException("No se detectó ningún rostro en la imagen desde URL.");
+            // Validación previa de rostros con detectFaces()
+            DetectFacesRequest detectRequest = DetectFacesRequest.builder()
+                    .image(awsImage)
+                    .attributes(Attribute.DEFAULT)
+                    .build();
+
+            DetectFacesResponse detectResponse = rekognitionClient.detectFaces(detectRequest);
+            if (detectResponse.faceDetails().isEmpty()) {
+                throw new RuntimeException("No se detectó ningún rostro en la imagen desde URL.");
+            }
+
+            IndexFacesRequest request = IndexFacesRequest.builder()
+                    .collectionId(collectionId)
+                    .image(awsImage)
+                    .externalImageId(externalId)
+                    .detectionAttributesWithStrings("DEFAULT")
+                    .build();
+
+            rekognitionClient.indexFaces(request);
+
+        } catch (RekognitionException e) {
+            System.err.println("Error de Rekognition al indexar desde URL: " + e.awsErrorDetails().errorMessage());
+            throw new RuntimeException("Error al indexar desde URL: " + e.statusCode(), e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error general al indexar desde URL", e);
         }
-
-        IndexFacesRequest request = IndexFacesRequest.builder()
-                .collectionId(collectionId)
-                .image(awsImage)
-                .externalImageId(externalId)
-                .detectionAttributesWithStrings("DEFAULT")
-                .build();
-
-        rekognitionClient.indexFaces(request);
-
-    } catch (RekognitionException e) {
-        System.err.println("Error de Rekognition al indexar desde URL: " + e.awsErrorDetails().errorMessage());
-        throw new RuntimeException("Error al indexar desde URL: " + e.statusCode(), e);
-    } catch (Exception e) {
-        throw new RuntimeException("Error general al indexar desde URL", e);
     }
-}
 }
