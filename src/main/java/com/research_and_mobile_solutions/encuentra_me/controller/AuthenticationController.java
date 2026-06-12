@@ -14,6 +14,7 @@ import com.research_and_mobile_solutions.encuentra_me.dto.AuthenticationResponse
 import com.research_and_mobile_solutions.encuentra_me.dto.RegisterRequest;
 import com.research_and_mobile_solutions.encuentra_me.service.AuthenticationService;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +27,7 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody RegisterRequest request
+        @Valid @RequestBody RegisterRequest request
     ) {
         System.out.println(request.getFirstName());
         System.out.println(request.getPaternalLastName());
